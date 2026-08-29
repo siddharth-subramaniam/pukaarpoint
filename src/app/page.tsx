@@ -10,7 +10,21 @@ export default function Home() {
       </div>
 
       <main className="container" style={{ paddingBottom: '80px', position: 'relative' }}>
-        <section style={{ padding: '80px 0 60px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+        
+        {/* Floating Helpline Card (Top Right Side) */}
+        <div className="card" style={{ position: 'absolute', top: '24px', right: '24px', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: '16px', zIndex: 10, background: 'white' }}>
+          <div style={{ background: '#fef2f2', padding: '12px', borderRadius: '50%', color: 'var(--accent-red)' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.05em', marginBottom: '2px' }}>National Helpline</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-red)', lineHeight: 1 }}>1930</div>
+          </div>
+        </div>
+
+        <section style={{ padding: '60px 0 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           
           {/* Trust Badges */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -24,11 +38,14 @@ export default function Home() {
             </span>
           </div>
 
-          <h1 className="heading-serif" style={{ fontSize: '2.5rem', color: 'var(--text-primary)', marginBottom: '20px', maxWidth: '800px', lineHeight: 1.2 }}>
-            AI-Powered Cyber Crime Triage & Reporting Portal
+          <h1 className="heading-serif" style={{ fontSize: '2.5rem', color: 'var(--text-primary)', marginBottom: '12px', maxWidth: '800px', lineHeight: 1.2 }}>
+            PukaarPoint
           </h1>
-          <p className="text-muted" style={{ fontSize: '1.15rem', maxWidth: '650px', marginBottom: '40px', lineHeight: 1.6 }}>
-            Experience next-generation victim support. Featuring an AI First Responder for immediate crisis mitigation, automated evidence redaction, and seamless law enforcement routing.
+          <p style={{ fontSize: '1.1rem', color: 'var(--accent-primary)', fontWeight: 600, marginBottom: '16px', letterSpacing: '0.02em' }}>
+            Intelligent Cybercrime Reporting & Evidence Management.
+          </p>
+          <p className="text-muted" style={{ fontSize: '1.15rem', maxWidth: '650px', marginBottom: '20px', lineHeight: 1.6 }}>
+            Streamline your path to justice. Securely file complaints, leverage our advanced AI to automatically extract and redact forensic evidence, and track your case with law enforcement in real-time.
           </p>
         </section>
 
@@ -150,18 +167,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mt-12" style={{ background: 'var(--accent-primary)', borderRadius: '12px', padding: '32px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px' }}>
-          <div>
-            <h3 className="heading-serif" style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'white' }}>National Helpline for Financial Frauds</h3>
-            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.95rem' }}>For immediate assistance in cases of cyber financial frauds, contact our 24/7 national helpline.</p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.1)', padding: '12px 24px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-            <span style={{ fontSize: '1.75rem', fontWeight: 'bold' }}>1930</span>
-          </div>
-        </section>
+
       </main>
     </>
   );

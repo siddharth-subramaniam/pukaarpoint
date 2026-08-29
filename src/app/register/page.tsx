@@ -5,9 +5,18 @@ import { useSearchParams } from 'next/navigation';
 import ImageRedactor from '@/components/ImageRedactor';
 
 function RegisterForm() {
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userIdentifier, setUserIdentifier] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTermsModal(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
   
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -121,7 +130,11 @@ function RegisterForm() {
       handleNext();
       return;
     }
+    setShowConfirmModal(true);
+  };
 
+  const confirmSubmit = async () => {
+    setShowConfirmModal(false);
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/complaints', {
@@ -145,31 +158,6 @@ function RegisterForm() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleExportJSON = () => {
-    const dataStr = JSON.stringify({
-      type: "bundle",
-      id: "bundle--" + crypto.randomUUID(),
-      spec_version: "2.1",
-      objects: [
-        {
-          type: "incident",
-          name: formData.broadCategory + " - " + formData.subCategory,
-          description: formData.incidentDescription,
-          created: new Date().toISOString(),
-          extended_properties: formData
-        }
-      ]
-    }, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `complaint_export_${Date.now()}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   if (submitted) {
@@ -197,9 +185,50 @@ function RegisterForm() {
 
   return (
     <>
-      
-
-      {!termsAccepted && (
+      {showTermsModal && !termsAccepted && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '24px'
+        }}>
+          <div style={{ maxWidth: '500px', width: '100%', background: 'white', position: 'relative', zIndex: 1001, padding: '32px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>Important Notice</h2>
+            <div style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.6, fontSize: '0.95rem' }}>
+              <p style={{ marginBottom: '12px' }}>You are about to file an official complaint with the authorities.</p>
+              <ul style={{ paddingLeft: '20px', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <li>Providing false information is a punishable offense under the law.</li>
+                <li>Ensure all evidence (screenshots, UTR numbers) is accurate.</li>
+                <li>Your IP address and device details may be logged for security.</li>
+              </ul>
+            </div>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button 
+                type="button" 
+                onClick={() => window.location.href = '/'}
+                className="btn-outline" 
+                style={{ padding: '10px 20px' }}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setTermsAccepted(true)}
+                className="btn-primary" 
+                style={{ padding: '10px 20px' }}
+              >
+                I Accept & Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showConfirmModal && (
         <div style={{
           position: 'fixed',
           top: 0, left: 0, width: '100vw', height: '100vh',
@@ -211,53 +240,50 @@ function RegisterForm() {
           justifyContent: 'center',
           padding: '24px'
         }}>
-          <div style={{ maxWidth: '600px', width: '100%', background: 'white', position: 'relative', zIndex: 101, padding: '24px', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
-            <div style={{ background: '#fef2f2', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', color: 'var(--accent-red)' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          <div style={{ maxWidth: '400px', width: '100%', background: 'white', position: 'relative', zIndex: 101, padding: '32px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+            <div style={{ background: '#eff6ff', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', color: '#2563eb' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
             </div>
-            <h1 className="heading-serif text-center" style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Terms & Conditions</h1>
-            
-            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '6px', border: '1px solid var(--border-color)', marginBottom: '24px', maxHeight: '35vh', overflowY: 'auto', lineHeight: 1.5, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-              <p style={{ marginBottom: '12px' }}><strong>1. Authenticity:</strong> By proceeding, you confirm that all the information provided in this complaint is true, accurate, and complete.</p>
-              <p style={{ marginBottom: '12px' }}><strong>2. Legal Consequences:</strong> Providing false information, fabricated evidence, or filing a malicious complaint is a punishable offense under the law.</p>
-              <p style={{ marginBottom: '12px' }}><strong>3. Confidentiality:</strong> Your information is treated with strict confidentiality. If you choose the anonymous option, your identity will not be disclosed to the accused.</p>
-              <p><strong>4. Cooperation:</strong> You agree to cooperate with law enforcement agencies if further clarification or evidence is required.</p>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-              <Link href="/">
-                <button type="button" className="btn-outline" style={{ padding: '10px 20px', fontSize: '0.95rem' }}>Decline</button>
-              </Link>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '12px', color: 'var(--text-primary)' }}>Confirm Submission</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
+              Are you sure you want to submit this complaint? Once submitted, it will be forwarded to the cyber cell and cannot be edited.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 type="button" 
-                className="btn-primary" 
-                style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-                onClick={() => setTermsAccepted(true)}
+                onClick={() => setShowConfirmModal(false)}
+                className="btn-outline" 
+                style={{ flex: 1, padding: '10px' }}
               >
-                I Accept & Confirm
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmSubmit}
+                className="btn-primary" 
+                style={{ flex: 1, padding: '10px' }}
+              >
+                Submit Now
               </button>
             </div>
           </div>
         </div>
       )}
 
+
       <main 
         style={{ 
           padding: '40px 5%', 
           maxWidth: '1600px',
           margin: '0 auto',
-          filter: !termsAccepted ? 'blur(8px)' : 'none',
-          opacity: !termsAccepted ? 0.6 : 1,
-          pointerEvents: !termsAccepted ? 'none' : 'auto',
-          userSelect: !termsAccepted ? 'none' : 'auto',
           transition: 'all 0.4s ease'
         }}
       >
         <div style={{ marginBottom: '40px' }}>
-          <h1 className="heading-serif" style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Register a Complaint</h1>
-          <p className="text-muted" style={{ fontSize: '0.95rem', maxWidth: '600px', marginBottom: '32px', lineHeight: 1.6 }}>
+          <h1 className="heading-serif" style={{ fontSize: '2rem', marginBottom: '16px' }}>Register a Complaint</h1>
+          <p className="text-muted" style={{ fontSize: '1rem', maxWidth: '600px', marginBottom: '32px', lineHeight: 1.6 }}>
             Please provide accurate details to help law enforcement take prompt action.
           </p>
           
@@ -542,15 +568,12 @@ function RegisterForm() {
               <h2 style={{ fontSize: '1.25rem', marginBottom: '24px' }}>Preview & Submit</h2>
               
               <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Review Data Artifacts</h3>
-                  <button type="button" onClick={handleExportJSON} className="btn-outline" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                    Download STIX 2.1 JSON
-                  </button>
+                <div style={{ marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: '1.1rem', margin: 0, marginBottom: '8px' }}>Review Data Artifacts</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                    Please confirm your observables before finalizing.
+                  </p>
                 </div>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-                  Please confirm your observables. You may download a localized JSON copy for your records before finalizing.
-                </p>
                 
                 <ul style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <li><strong>Category:</strong> {formData.broadCategory} / {formData.subCategory}</li>
@@ -622,7 +645,7 @@ function RegisterForm() {
             {step > 1 ? (
               <button type="button" className="btn-outline" onClick={handlePrev} style={{ padding: '10px 20px', fontSize: '0.95rem' }}>Back</button>
             ) : (
-              <button type="button" className="btn-outline" onClick={() => setTermsAccepted(false)} style={{ padding: '10px 20px', fontSize: '0.95rem' }}>Cancel</button>
+              <button type="button" className="btn-outline" onClick={() => window.location.href = '/'} style={{ padding: '10px 20px', fontSize: '0.95rem' }}>Cancel</button>
             )}
             
             {step < 4 ? (

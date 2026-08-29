@@ -4,8 +4,8 @@ import Navbar from "@/components/Navbar";
 import TriageBot from "@/components/TriageBot";
 
 export const metadata: Metadata = {
-  title: "National Cyber Crime Reporting Portal",
-  description: "An official portal to safely and anonymously report cybercrime complaints.",
+  title: "PukaarPoint",
+  description: "Raise it. Track it. Resolve it. — Your civic complaint and cybercrime reporting portal.",
 };
 
 export default function RootLayout({

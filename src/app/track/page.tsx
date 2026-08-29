@@ -116,8 +116,8 @@ export default function TrackComplaint() {
         }}
       >
         <div style={{ marginBottom: '40px' }}>
-          <h1 className="heading-serif" style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Track your Complaint</h1>
-          <p className="text-muted" style={{ fontSize: '0.95rem', maxWidth: '600px', marginBottom: '32px', lineHeight: 1.6 }}>
+          <h1 className="heading-serif" style={{ fontSize: '2rem', marginBottom: '16px' }}>Track your Complaint</h1>
+          <p className="text-muted" style={{ fontSize: '1rem', maxWidth: '600px', marginBottom: '32px', lineHeight: 1.6 }}>
             Enter the tracking ID you received after filing your complaint. For privacy reasons, you must verify your identity via OTP to view the status.
           </p>
         </div>

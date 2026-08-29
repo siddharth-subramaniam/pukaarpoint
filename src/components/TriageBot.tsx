@@ -8,12 +8,13 @@ interface Message {
   text: string;
   isEmergency?: boolean;
   link?: string;
+  linkText?: string;
 }
 
 export default function TriageBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { sender: 'bot', text: 'Hello. I am the Cyber First Responder Bot. To get started, please tell me briefly what happened.' }
+    { sender: 'bot', text: 'Hi! I\'m the PukaarPoint AI Assistant. I can help you report a cybercrime emergency, guide you through the portal, or answer any questions. What brings you here today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -61,44 +62,64 @@ export default function TriageBot() {
       let responseText = data.text || '';
       let isEmergency = false;
       let link = '';
+      let linkText = '';
 
-      // Aggressive scrubbing: slice off PREFILL_DATA entirely regardless of parse success
-      const prefillIndex = responseText.search(/\*?PREFILL_DATA\*?/i);
+      // Strip PREFILL_DATA block and extract description for form pre-fill
+      const prefillIndex = responseText.search(/PREFILL_DATA/i);
       if (prefillIndex !== -1) {
         const prefillSection = responseText.substring(prefillIndex);
-        responseText = responseText.substring(0, prefillIndex).trim(); // Guarantee UI never sees it
-        
-        // Now attempt to safely extract the JSON from the sliced off section
+        responseText = responseText.substring(0, prefillIndex).trim();
         try {
           const jsonMatch = prefillSection.match(/({[\s\S]*})/);
           if (jsonMatch) {
-            let jsonStr = jsonMatch[1].trim();
-            const prefillData = JSON.parse(jsonStr);
+            const prefillData = JSON.parse(jsonMatch[1].trim());
             if (prefillData.description) {
               localStorage.setItem('prefill_description', prefillData.description);
             }
           }
         } catch(e) {
-          console.error("Failed to parse prefill telemetry", e);
+          console.error("Failed to parse prefill data", e);
         }
       }
 
+      // Parse trigger tokens to decide which CTA to show
       if (responseText.includes('EMERGENCY_TRIGGER_1930')) {
         isEmergency = true;
         responseText = responseText.replace('EMERGENCY_TRIGGER_1930', '').trim();
       } else if (responseText.includes('EXTORTION_TRIGGER')) {
         link = '/register?category=individuals';
+        linkText = 'Proceed to Form';
         responseText = responseText.replace('EXTORTION_TRIGGER', '').trim();
+      } else if (responseText.includes('TRACKING_TRIGGER')) {
+        link = '/track';
+        linkText = 'Track Complaint';
+        responseText = responseText.replace('TRACKING_TRIGGER', '').trim();
       } else if (responseText.includes('GENERAL_TRIGGER')) {
         link = '/register';
+        linkText = 'Proceed to Form';
         responseText = responseText.replace('GENERAL_TRIGGER', '').trim();
+      } else if (responseText.includes('EVIDENCE_TRIGGER')) {
+        link = '/evidence';
+        linkText = 'Go to Evidence Toolkit';
+        responseText = responseText.replace('EVIDENCE_TRIGGER', '').trim();
+      } else if (responseText.includes('DATABASE_TRIGGER')) {
+        link = '/database';
+        linkText = 'Check Scamster Database';
+        responseText = responseText.replace('DATABASE_TRIGGER', '').trim();
+      } else if (responseText.includes('HEATMAP_TRIGGER')) {
+        link = '/heatmap';
+        linkText = 'View Live Heatmap';
+        responseText = responseText.replace('HEATMAP_TRIGGER', '').trim();
+      } else if (responseText.includes('NO_TRIGGER')) {
+        responseText = responseText.replace('NO_TRIGGER', '').trim();
       }
 
       setMessages(prev => [...prev, { 
         sender: 'bot', 
         text: responseText,
         isEmergency,
-        link
+        link,
+        linkText
       }] as any);
 
     } catch (err) {
@@ -113,6 +134,7 @@ export default function TriageBot() {
       {/* Floating Action Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
+        title="PukaarPoint Assistant"
         style={{
           position: 'fixed',
           bottom: '24px',
@@ -164,8 +186,8 @@ export default function TriageBot() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: 'white' }}>Emergency Triage Bot</h3>
-              <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.9 }}>AI First Responder</p>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: 'white' }}>PukaarPoint Assistant</h3>
+              <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.9 }}>Triage & Portal Guide</p>
             </div>
           </div>
 
@@ -190,13 +212,14 @@ export default function TriageBot() {
                   boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
                   fontSize: '0.9rem',
                   lineHeight: 1.5,
-                  fontWeight: m.sender === 'bot' ? 600 : 400
+                  fontWeight: m.sender === 'bot' ? 500 : 400,
+                  whiteSpace: 'pre-wrap'
                 }}>
                   {m.text}
                   {m.link && (
                     <div style={{ marginTop: '12px' }}>
                       <Link href={m.link}>
-                        <button className="btn-primary" style={{ padding: '6px 12px', fontSize: '0.8rem', width: '100%' }}>Proceed to Form</button>
+                        <button className="btn-primary" style={{ padding: '6px 12px', fontSize: '0.8rem', width: '100%' }}>{m.linkText || 'Proceed to Form'}</button>
                       </Link>
                     </div>
                   )}
@@ -212,6 +235,18 @@ export default function TriageBot() {
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+                <div style={{ background: 'var(--accent-red)', color: 'white', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div style={{ padding: '12px 16px', borderRadius: '16px', borderBottomLeftRadius: '0px', background: 'white', border: '1px solid var(--border-color)', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                  {[0, 1, 2].map(i => (
+                    <div key={i} style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--accent-red)', opacity: 0.7, animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                  ))}
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
