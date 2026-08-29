@@ -38,9 +38,17 @@ export default function Home() {
             </span>
           </div>
 
-          <h1 className="heading-serif" style={{ fontSize: '2.5rem', color: 'var(--text-primary)', marginBottom: '12px', maxWidth: '800px', lineHeight: 1.2 }}>
-            PukaarPoint
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+            <div style={{ background: 'var(--accent-primary)', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '3rem', color: 'var(--accent-primary)', letterSpacing: '-1px', margin: 0, display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700 }}>Pukaar</span>
+              <span style={{ fontWeight: 400 }}>Point</span>
+            </h1>
+          </div>
           <p style={{ fontSize: '1.1rem', color: 'var(--accent-primary)', fontWeight: 600, marginBottom: '16px', letterSpacing: '0.02em' }}>
             Intelligent Cybercrime Reporting & Evidence Management.
           </p>
