@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [userIdentifier, setUserIdentifier] = useState('');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const pathname = usePathname();
@@ -20,6 +21,11 @@ export default function Navbar() {
     } else {
       setIsLoggedIn(false);
       setUserIdentifier('');
+    }
+
+    if (pathname.startsWith('/admin')) {
+      const adminToken = localStorage.getItem('admin_token');
+      setIsAdminLoggedIn(!!adminToken);
     }
   }, [pathname]);
 
@@ -88,13 +94,15 @@ export default function Navbar() {
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <button 
-                onClick={() => setShowLogoutConfirm(true)} 
-                className="btn-outline" 
-                style={{ padding: '6px 12px', fontSize: '0.85rem' }}
-              >
-                Logout
-              </button>
+              {isAdminLoggedIn && (
+                <button 
+                  onClick={() => setShowLogoutConfirm(true)} 
+                  className="btn-outline" 
+                  style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+                >
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </header>
